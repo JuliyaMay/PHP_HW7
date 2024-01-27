@@ -1,11 +1,26 @@
 <?php
+session_start(); // Start the session
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
+
+    // Initialize the email array in the session if it doesn't exist
+    if (!isset($_SESSION['emails'])) {
+        $_SESSION['emails'] = array();
+    }
+
+    // Add the new email to the session array
+    $_SESSION['emails'][] = $email;
+
+    // Display the current email
     echo "Your E-Mail is " . htmlspecialchars($email);
     echo "<br>";
-    // echo "Your server is " . htmlspecialchars($_SERVER["PHP_SELF"]);
-    // echo "<br>";
-    // echo "Your REQUEST_METHOD is " . htmlspecialchars($_SERVER["REQUEST_METHOD"]);
+
+    // Display all emails stored in the session
+    echo "All E-Mails: <br>";
+    foreach ($_SESSION['emails'] as $storedEmail) {
+        echo htmlspecialchars($storedEmail) . "<br>";
+    }
 }
 ?>
 
