@@ -45,31 +45,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         deleteMessage($conn, $_POST['message_id'], $user_id, $role);
     }
 }
-
-// Display all messages
-$sql = "SELECT messages.id, messages.user_id, users.username, messages.message, messages.created_at FROM messages JOIN users ON messages.user_id = users.id ORDER BY messages.created_at ASC";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        echo "[" . $row["created_at"] . "] " . $row["username"] . ": " . $row["message"];
-        if ($role == 'admin' || ($role == 'user' && $row["user_id"] == $user_id)) {
-            echo " <form method='post' style='display: inline;'>
-            <input type='hidden' name='message_id' value='" . $row["id"] . "'>
-            <input type='submit' name='delete_message' value='Delete'>
-            </form>";
-        }
-        echo "<br>";
-    }
-} else {
-    echo "No messages.<br>";
-}
-
-// Message input form for logged-in users
-if (isset($user_id)) {
-    echo "<form method='post'>";
-    echo "Message: <input type='text' name='message'>";
-    echo "<input type='submit' value='Send'>";
-    echo "</form>";
-}
 ?>
+
+<html>
+<head>
+    <title>Chat</title>
+    <style>
+    .blur {
+        color: transparent;
+        text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    </style>
+
+    <script>
+        function fetchMessages() {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("chatDisplay").innerHTML = this.responseText;
+                }
+            };
+            xhr.open("GET", "fetch_messages.php", true);
+            xhr.send();
+        }
+
+        // Fetch messages every 5 seconds
+        setInterval(fetchMessages, 5000);
+        fetchMessages(); // initial fetch
+    </script>
+</head>
+<body>
+    <div id="chatDisplay">
+        <!-- Messages will be displayed here -->
+    </div>
+
+    <?php if (isset($user_id)) : ?>
+        <form method='post'>
+            Message: <input type='text' name='message'>
+            <input type='submit' value='Send'>
+        </form>
+    <?php endif; ?>
+</body>
+</html>
+
