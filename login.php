@@ -11,16 +11,19 @@ include 'db.php';
 $login_error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $conn->real_escape_string($_POST['username']);
-    $password = $conn->real_escape_string($_POST['password']);
-    $sql = "SELECT id, username, role FROM users WHERE username = '$username' AND password = '$password'";
-    $result = $conn->query($sql);
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    
+    $sql = "SELECT id, username, role FROM users WHERE username = :username AND password = :password";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['username' => $username, 'password' => $password]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $_SESSION['user_id'] = $row['id'];
-        $_SESSION['username'] = $row['username'];
-        $_SESSION['role'] = $row['role'];
+    if ($user) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
 
         header("Location: chat.php");
         exit;
@@ -28,7 +31,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $login_error = "Invalid username or password.";
     }
 }
-
 ?>
 
 <html>
@@ -43,6 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <br>
         <input type="submit" value="Login">
     </form>
-    <?php if($login_error != '') { echo "<p>$login_error</p>"; } ?>
+    <?php if ($login_error != '') { echo "<p>$login_error</p>"; } ?>
 </body>
 </html>
