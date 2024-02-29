@@ -13,36 +13,40 @@ $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 
 // Function to post a message
-function postMessage($conn, $user_id, $message) {
-    $sql = "INSERT INTO messages (user_id, message) VALUES ('$user_id', '$message')";
-    if ($conn->query($sql) === TRUE) {
+function postMessage($pdo, $user_id, $message) {
+    $sql = "INSERT INTO messages (user_id, message) VALUES (:user_id, :message)";
+    $stmt = $pdo->prepare($sql);
+    if ($stmt->execute([':user_id' => $user_id, ':message' => $message])) {
         echo "Message posted!<br>";
     } else {
-        echo "Error posting message: " . $conn->error . "<br>";
+        echo "Error posting message.<br>";
     }
 }
 
 // Function to delete a message
-function deleteMessage($conn, $message_id, $user_id, $role) {
+function deleteMessage($pdo, $message_id, $user_id, $role) {
     if ($role == 'admin') {
-        $sql = "DELETE FROM messages WHERE id = '$message_id'";
+        $sql = "DELETE FROM messages WHERE id = :message_id";
+        $params = [':message_id' => $message_id];
     } else {
-        $sql = "DELETE FROM messages WHERE id = '$message_id' AND user_id = '$user_id'";
+        $sql = "DELETE FROM messages WHERE id = :message_id AND user_id = :user_id";
+        $params = [':message_id' => $message_id, ':user_id' => $user_id];
     }
-    if ($conn->query($sql) === TRUE) {
+    $stmt = $pdo->prepare($sql);
+    if ($stmt->execute($params)) {
         echo "Message deleted!<br>";
     } else {
-        echo "Error deleting message: " . $conn->error . "<br>";
+        echo "Error deleting message.<br>";
     }
 }
 
 // Handling POST request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['message']) && !empty($_POST['message'])) {
-        postMessage($conn, $user_id, $conn->real_escape_string($_POST['message']));
+        postMessage($pdo, $user_id, $_POST['message']);
     }
     if (isset($_POST['delete_message']) && isset($_POST['message_id'])) {
-        deleteMessage($conn, $_POST['message_id'], $user_id, $role);
+        deleteMessage($pdo, $_POST['message_id'], $user_id, $role);
     }
 }
 ?>
@@ -87,4 +91,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php endif; ?>
 </body>
 </html>
-

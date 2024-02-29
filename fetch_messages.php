@@ -18,10 +18,11 @@ function containsBadWord($message, $badWords) {
 }
 
 $sql = "SELECT messages.id, messages.user_id, users.username, messages.message, messages.created_at FROM messages JOIN users ON messages.user_id = users.id ORDER BY messages.created_at ASC";
-$result = $conn->query($sql);
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+$stmt = $pdo->query($sql);
+
+if ($stmt->rowCount() > 0) {
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $messageText = $row["message"];
 
         // Заміна кожного поганого слова на заблюроване
@@ -30,8 +31,7 @@ if ($result->num_rows > 0) {
             $messageText = preg_replace("/\b" . preg_quote($badWord, '/') . "\b/ui", $blurredWord, $messageText);
         }
 
-        //echo "<div>[" . $row["created_at"] . "] " . $row["username"] . ": " . $messageText . "</div>";
-        echo  "<div>[" . $row["created_at"] . "] " . $row["username"] . ": " . $messageText;
+        echo "<div>[" . $row["created_at"] . "] " . $row["username"] . ": " . $messageText;
         if ($role == 'admin' || ($role == 'user' && $row["user_id"] == $user_id)) {
             echo " <form method='post' style='display: inline;'>
             <input type='hidden' name='message_id' value='" . $row["id"] . "'>
@@ -42,5 +42,4 @@ if ($result->num_rows > 0) {
 } else {
     echo "No messages.<br>";
 }
-
 ?>
