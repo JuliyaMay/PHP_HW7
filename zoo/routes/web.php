@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\FoodController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +18,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get(
+    'workers',
+    [WorkerController::class, 'showAll']
+);
+
+Route::get(
+    'food',
+    [FoodController::class, 'showAll']
+);
