@@ -15,5 +15,13 @@ class Food extends Model
         'prise',
     ];
 
+    // public function animals()
+    // {
+    //     return $this->belongsToMany(Animal::class, 'food', 'food_id', 'id');
+    // }
+    public function animals()
+    {
+        return $this->hasMany(Animal::class);
+    }
 }
 

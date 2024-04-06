@@ -19,9 +19,9 @@ class CreateAnimalsTable extends Migration
             $table->string('name');
             $table->integer('age');
             $table->unsignedBigInteger('worker');
-            $table->foreign('worker')->references('id')->on('workers');
+            $table->foreign('worker_id')->references('id')->on('workers');
             $table->unsignedBigInteger('food');
-            $table->foreign('food')->references('id')->on('food');
+            $table->foreign('food_id')->references('id')->on('food');
             $table->timestamps();
         });
     }

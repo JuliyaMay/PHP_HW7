@@ -28,4 +28,9 @@ class Animal extends Model
     {
         return $this->hasMany(Food::class);
     }
+
+    public function foodTypes()
+    {
+        return $this->belongsToMany(Food::class, 'animal_food', 'animal_id', 'food_id');
+    }
 }
